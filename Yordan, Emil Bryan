@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="UTF-8">
+    <title>Full-Stack App (Emil Bryan Yordan)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="not-authenticated">
+
+<!-- ================= NAVIGATION ================= -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark px-3">
+    <a class="navbar-brand" href="#/">Full-Stack App (Emil Bryan Yordan)</a>
+
+    <div class="ms-auto d-flex gap-3">
+        
+
+        <!-- Logged Out Links -->
+        <a href="#/login" class="nav-link text-white role-logged-out">Login</a>
+        <a href="#/register" class="nav-link text-white role-logged-out">Register</a>
+
+        <!-- Logged In Links -->
+        <a href="#/profile" class="nav-link text-white role-logged-in">Profile</a>
+        <a href="#/requests" class="nav-link text-white role-logged-in">My Requests</a>
+
+        <!-- Admin Only -->
+        <a href="#/employees" class="nav-link text-white role-admin">Employees</a>
+        <a href="#/departments" class="nav-link text-white role-admin">Departments</a>
+        <a href="#/accounts" class="nav-link text-white role-admin">Accounts</a>
+
+        <a href="#" onclick="logout()" class="nav-link text-danger role-logged-in">Logout</a>
+    </div>
+</nav>
+
+<main class="container py-4">
+    
+
+<!-- ================= HOME ================= -->
+<section id="home-page" class="page active">
+    <h2>Welcome to Full-Stack App</h2>
+    <p class="text-muted">
+        Static prototype before backend integration.
+    </p>
+    <button class="btn btn-primary" onclick="navigateTo('#/login')">
+        Get Started →
+    </button>
+</section>
+
+<!-- ================= REGISTER ================= -->
+<section id="register-page" class="page">
+    <h3>Register</h3>
+
+    <form onsubmit="event.preventDefault(); registerUser({
+        firstName: this.firstName.value,
+        lastName: this.lastName.value,
+        email: this.email.value,
+        password: this.password.value
+    });">
+
+        <div class="mb-3">
+            <input name="firstName" class="form-control" placeholder="First Name" required>
+        </div>
+
+        <div class="mb-3">
+            <input name="lastName" class="form-control" placeholder="Last Name" required>
+        </div>
+
+        <div class="mb-3">
+            <input name="email" type="email" class="form-control" placeholder="Email" required>
+        </div>
+
+        <div class="mb-3">
+            <input name="password" type="password" minlength="6" class="form-control" placeholder="Password (min 6 chars)" required>
+        </div>
+
+        <button class="btn btn-success w-100">Register</button>
+    </form>
+</section>
+
+<!-- ================= VERIFY EMAIL ================= -->
+<section id="verify-email-page" class="page">
+    <h3>Email Verification</h3>
+    <p>Verification sent. Click below to simulate.</p>
+
+    <button class="btn btn-warning" onclick="simulateVerification()">
+        ✅ Simulate Email Verification
+    </button>
+</section>
+
+<!-- ================= LOGIN ================= -->
+<section id="login-page" class="page">
+    <h3>Login</h3>
+
+    <form onsubmit="event.preventDefault(); login(this.email.value, this.password.value);">
+
+        <div class="mb-3">
+            <input name="email" type="email" class="form-control" placeholder="Email" required>
+        </div>
+
+        <div class="mb-3">
+            <input name="password" type="password" class="form-control" placeholder="Password" required>
+        </div>
+
+        <button class="btn btn-primary w-100">Login</button>
+    </form>
+</section>
+
+<!-- ================= PROFILE ================= -->
+<section id="profile-page" class="page">
+    <h3>Profile</h3>
+    <div id="profile-content"></div>
+</section>
+
+<!-- ================= ACCOUNTS (ADMIN) ================= -->
+<section id="accounts-page" class="page">
+    <h3>Accounts (Admin)</h3>
+
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Verified</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="accounts-table"></tbody>
+    </table>
+</section>
+
+<!-- ================= DEPARTMENTS ================= -->
+<section id="departments-page" class="page">
+    <h3>Departments</h3>
+
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody id="departments-table"></tbody>
+    </table>
+</section>
+
+<!-- ================= EMPLOYEES ================= -->
+<section id="employees-page" class="page">
+    <h3>Employees</h3>
+
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Email</th>
+                <th>Position</th>
+                <th>Department</th>
+            </tr>
+        </thead>
+        <tbody id="employees-table"></tbody>
+    </table>
+</section>
+
+<!-- ================= REQUESTS ================= -->
+<section id="requests-page" class="page">
+    <h3>My Requests</h3>
+
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Type</th>
+                <th>Status</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody id="requests-table"></tbody>
+    </table>
+</section>
+
+</main>
+
+<script src="script.js"></script>
+</body>
+</html>
+
+
+
+/* ================= PAGE ROUTING ================= */
+
+.page {
+    display: none;
+}
+
+.page.active {
+    display: block;
+}
+
+/* ================= AUTH VISIBILITY ================= */
+
+body.not-authenticated .role-logged-in {
+    display: none;
+}
+
+body.authenticated .role-logged-out {
+    display: none;
+}
+
+.role-admin {
+    display: none;
+}
+
+body.is-admin .role-admin {
+    display: inline-block;
+}
+
+/* ================= GENERAL STYLING ================= */
+
+body {
+    background-color: #f8f9fa;
+}
+
+h2, h3 {
+    margin-bottom: 20px;
+}
+
+table {
+    background: white;
+}
+
+.navbar a {
+    text-decoration: none;
+}
+
+/* Smooth transitions */
+.page {
+    animation: fadeIn 0.2s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+
+
+/**************************************
+ * GLOBAL STATE
+ **************************************/
+let currentUser = null;
+const STORAGE_KEY = "ipt_demo_v1";
+
+window.db = {
+    accounts: [],
+    departments: [],
+    employees: [],
+    requests: []
+};
+
+
+/**************************************
+ * STORAGE FUNCTIONS
+ **************************************/
+function loadFromStorage() {
+    try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+
+        if (!raw) {
+            seedDatabase();
+            return;
+        }
+
+        window.db = JSON.parse(raw);
+
+        if (!window.db.accounts) throw "Invalid DB";
+
+    } catch (e) {
+        console.log("Storage corrupted. Resetting...");
+        seedDatabase();
+    }
+}
+
+function saveToStorage() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(window.db));
+}
+
+function seedDatabase() {
+    window.db = {
+        accounts: [
+            {
+                firstName: "Admin",
+                lastName: "User",
+                email: "admin@example.com",
+                password: "Password123!",
+                role: "admin",
+                verified: true
+            }
+        ],
+        departments: [
+            { id: 1, name: "Engineering", description: "Engineering Dept" },
+            { id: 2, name: "HR", description: "Human Resources" }
+        ],
+        employees: [],
+        requests: []
+    };
+
+    saveToStorage();
+}
+
+
+/**************************************
+ * ROUTING SYSTEM
+ **************************************/
+function navigateTo(hash) {
+    window.location.hash = hash;
+}
+
+function handleRouting() {
+    const hash = window.location.hash || "#/";
+
+    document.querySelectorAll(".page").forEach(p => {
+        p.classList.remove("active");
+    });
+
+    const route = hash.replace("#/", "");
+    const page = document.getElementById(route + "-page");
+
+    const protectedRoutes = ["profile", "employees", "departments", "accounts", "requests"];
+    const adminRoutes = ["employees", "departments", "accounts"];
+
+    if (protectedRoutes.includes(route) && !currentUser) {
+        return navigateTo("#/login");
+    }
+
+    if (adminRoutes.includes(route) && currentUser?.role !== "admin") {
+        return navigateTo("#/");
+    }
+
+    if (page) {
+        page.classList.add("active");
+
+        if (route === "profile") renderProfile();
+        if (route === "accounts") renderAccountsList();
+        if (route === "departments") renderDepartments();
+        if (route === "employees") renderEmployees();
+        if (route === "requests") renderRequests();
+    }
+}
+
+window.addEventListener("hashchange", handleRouting);
+
+
+/**************************************
+ * AUTH SYSTEM
+ **************************************/
+function setAuthState(isAuth, user = null) {
+    currentUser = isAuth ? user : null;
+
+    document.body.classList.toggle("authenticated", isAuth);
+    document.body.classList.toggle("not-authenticated", !isAuth);
+
+    if (user?.role === "admin") {
+        document.body.classList.add("is-admin");
+    } else {
+        document.body.classList.remove("is-admin");
+    }
+}
+
+
+/**************************************
+ * REGISTRATION
+ **************************************/
+function registerUser(data) {
+    const exists = window.db.accounts.find(a => a.email === data.email);
+    if (exists) return alert("Email already exists.");
+
+    window.db.accounts.push({
+        ...data,
+        role: "user",
+        verified: false
+    });
+
+    localStorage.setItem("unverified_email", data.email);
+    saveToStorage();
+    navigateTo("#/verify-email");
+}
+
+
+/**************************************
+ * EMAIL VERIFICATION
+ **************************************/
+function simulateVerification() {
+    const email = localStorage.getItem("unverified_email");
+    const account = window.db.accounts.find(a => a.email === email);
+
+    if (account) {
+        account.verified = true;
+        saveToStorage();
+        localStorage.removeItem("unverified_email");
+        navigateTo("#/login");
+    }
+}
+
+
+/**************************************
+ * LOGIN
+ **************************************/
+function login(email, password) {
+    const user = window.db.accounts.find(a =>
+        a.email === email &&
+        a.password === password &&
+        a.verified === true
+    );
+
+    if (!user) return alert("Invalid credentials or not verified.");
+
+    localStorage.setItem("auth_token", user.email);
+    setAuthState(true, user);
+    navigateTo("#/profile");
+}
+
+
+/**************************************
+ * LOGOUT
+ **************************************/
+function logout() {
+    localStorage.removeItem("auth_token");
+    setAuthState(false);
+    navigateTo("#/");
+}
+
+
+/**************************************
+ * PROFILE PAGE
+ **************************************/
+function renderProfile() {
+    const container = document.getElementById("profile-content");
+    container.innerHTML = `
+        <h3>${currentUser.firstName} ${currentUser.lastName}</h3>
+        <p>Email: ${currentUser.email}</p>
+        <p>Role: ${currentUser.role}</p>
+        <button class="btn btn-primary" onclick="alert('Edit coming soon')">
+            Edit Profile
+        </button>
+    `;
+}
+
+
+/**************************************
+ * ADMIN - ACCOUNTS
+ **************************************/
+function renderAccountsList() {
+    const table = document.getElementById("accounts-table");
+    table.innerHTML = window.db.accounts.map(a => `
+        <tr>
+            <td>${a.firstName} ${a.lastName}</td>
+            <td>${a.email}</td>
+            <td>${a.role}</td>
+            <td>${a.verified ? "✓" : "—"}</td>
+            <td>
+                <button onclick="deleteAccount('${a.email}')">Delete</button>
+            </td>
+        </tr>
+    `).join("");
+}
+
+function deleteAccount(email) {
+    if (email === currentUser.email) {
+        return alert("You cannot delete yourself.");
+    }
+
+    if (!confirm("Delete account?")) return;
+
+    window.db.accounts = window.db.accounts.filter(a => a.email !== email);
+    saveToStorage();
+    renderAccountsList();
+}
+
+
+/**************************************
+ * ADMIN - DEPARTMENTS
+ **************************************/
+function renderDepartments() {
+    const table = document.getElementById("departments-table");
+    table.innerHTML = window.db.departments.map(d => `
+        <tr>
+            <td>${d.name}</td>
+            <td>${d.description}</td>
+        </tr>
+    `).join("");
+}
+
+
+/**************************************
+ * ADMIN - EMPLOYEES
+ **************************************/
+function renderEmployees() {
+    const table = document.getElementById("employees-table");
+    table.innerHTML = window.db.employees.map(e => `
+        <tr>
+            <td>${e.id}</td>
+            <td>${e.email}</td>
+            <td>${e.position}</td>
+            <td>${e.department}</td>
+        </tr>
+    `).join("");
+}
+
+
+/**************************************
+ * USER REQUESTS
+ **************************************/
+function renderRequests() {
+    const table = document.getElementById("requests-table");
+
+    const myRequests = window.db.requests.filter(r =>
+        r.employeeEmail === currentUser.email
+    );
+
+    table.innerHTML = myRequests.map(r => `
+        <tr>
+            <td>${r.type}</td>
+            <td>${r.status}</td>
+            <td>${r.date}</td>
+        </tr>
+    `).join("");
+}
+
+function createRequest(data) {
+    window.db.requests.push({
+        ...data,
+        status: "Pending",
+        date: new Date().toLocaleDateString(),
+        employeeEmail: currentUser.email
+    });
+
+    saveToStorage();
+    renderRequests();
+}
+
+
+/**************************************
+ * INIT APP
+ **************************************/
+document.addEventListener("DOMContentLoaded", () => {
+    loadFromStorage();
+
+    const token = localStorage.getItem("auth_token");
+    if (token) {
+        const user = window.db.accounts.find(a => a.email === token);
+        if (user) setAuthState(true, user);
+    }
+
+    if (!window.location.hash) {
+        navigateTo("#/");
+    }
+
+    handleRouting();
+});
